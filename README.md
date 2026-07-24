@@ -1,22 +1,33 @@
 # RestaurantOS — backend
 
-Database seeding and server-side notes for RestaurantOS.
+Express API host deployed on Vercel:
 
-## API routes
+https://restaurent-management-backend-sage.vercel.app
 
-HTTP APIs are Next.js route handlers in:
+## Run locally
 
-`../frontend/src/app/api/`
-
-Shared server code (models, auth, db, money, rbac) lives alongside the app in:
-
-`../frontend/src/models/` and `../frontend/src/lib/`
+```bash
+cp .env.example .env
+npm install
+npm start
+```
 
 ## Seed
 
 ```bash
-npm install
 npm run seed
 ```
 
-Reads `../frontend/.env.local` for `MONGODB_URI`.
+Loads `MONGODB_URI` from `.env` / `.env.local` / `../frontend/.env.local`.
+
+## Deploy (Vercel)
+
+`vercel.json` builds `index.js` with `@vercel/node`. Set env vars in the Vercel project:
+
+- `MONGODB_URI`
+- `CORS_ORIGIN` (your frontend origin(s), comma-separated)
+- `APP_URL=https://restaurent-management-backend-sage.vercel.app`
+
+## Note
+
+RestaurantOS HTTP route handlers also live under `../frontend/src/app/api/` (Next.js). The frontend uses `NEXT_PUBLIC_API_URL` pointing at this Vercel backend.

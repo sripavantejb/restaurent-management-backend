@@ -7,10 +7,12 @@ import { resolve } from "path";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-// Load .env.local without dotenv package (backend/ or frontend/)
+// Load .env / .env.local without dotenv (backend/ or frontend/)
 const envCandidates = [
+  resolve(process.cwd(), ".env"),
   resolve(process.cwd(), ".env.local"),
   resolve(process.cwd(), "../frontend/.env.local"),
+  resolve(process.cwd(), "../frontend/.env"),
   resolve(process.cwd(), "frontend/.env.local"),
 ];
 for (const envPath of envCandidates) {
@@ -113,11 +115,32 @@ async function main() {
     new mongoose.Schema(
       {
         name: String,
+        slug: String,
+        status: String,
+        contactEmail: String,
+        contactPhone: String,
         logoUrl: String,
         gstNumber: String,
         currency: String,
         timezone: String,
         address: String,
+        qrSecretVersion: Number,
+        qrOrderingEnabled: Boolean,
+        qrApprovalMode: Boolean,
+        menuVersion: String,
+      },
+      { timestamps: true }
+    )
+  );
+
+  const PlatformAdmin = mongoose.model(
+    "PlatformAdmin",
+    new mongoose.Schema(
+      {
+        name: String,
+        email: String,
+        passwordHash: String,
+        isActive: Boolean,
       },
       { timestamps: true }
     )
@@ -258,13 +281,30 @@ async function main() {
     )
   );
 
+  const passwordHash = await bcrypt.hash("demo1234", 10);
+
+  await PlatformAdmin.create({
+    name: "Platform Admin",
+    email: "admin@restaurantos.com",
+    passwordHash,
+    isActive: true,
+  });
+
   const restaurant = await Restaurant.create({
-    name: "Spice Route",
+    name: "Tiffinate",
+    slug: "tiffinate",
+    status: "ACTIVE",
+    contactEmail: "owner@demo.com",
+    contactPhone: "",
     logoUrl: "",
     gstNumber: "36AABCU9603R1ZM",
     currency: "INR",
     timezone: "Asia/Kolkata",
     address: "Hyderabad, Telangana",
+    qrSecretVersion: 1,
+    qrOrderingEnabled: true,
+    qrApprovalMode: false,
+    menuVersion: "1",
   });
 
   const [b1, b2] = await Branch.create([
@@ -284,7 +324,6 @@ async function main() {
     },
   ]);
 
-  const passwordHash = await bcrypt.hash("demo1234", 10);
   const users = [
     { name: "Ananya Owner", email: "owner@demo.com", role: "OWNER", branchId: b1._id },
     { name: "Rohan Manager", email: "manager@demo.com", role: "MANAGER", branchId: b1._id },
@@ -486,7 +525,8 @@ async function main() {
   }
 
   console.log("Seed complete.");
-  console.log("Restaurant:", restaurant.name);
+  console.log("Platform admin: admin@restaurantos.com / demo1234 → /admin/login");
+  console.log("Restaurant:", restaurant.name, `(${restaurant.slug})`);
   console.log("Branches: Banjara Hills (B1), Gachibowli (B2)");
   console.log("Users: owner/manager/cashier/waiter/chef @demo.com / demo1234");
   console.log("Menu items on B1:", itemsB1.length);
