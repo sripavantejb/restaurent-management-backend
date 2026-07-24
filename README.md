@@ -1,31 +1,38 @@
-# RestaurantOS — frontend
+# RestaurantOS — backend
 
-Next.js 15 App Router (UI + API routes).
+Express API host deployed on Vercel:
 
-## Setup
+https://restaurent-management-backend-sage.vercel.app
+
+## Run locally
 
 ```bash
+cp .env.example .env
 npm install
-npm run seed
-npm run dev
+npm start
 ```
 
-Open http://localhost:3000
+## Seed
 
-### Demo users (password `demo1234`)
+```bash
+npm run seed
+```
 
-| Email | Role | URL |
-|---|---|---|
-| admin@restaurantos.com | Platform admin | `/admin/login` |
-| owner@demo.com | OWNER | `/login` |
-| manager@demo.com | MANAGER | `/login` |
-| cashier@demo.com | CASHIER → `/pos` | `/login` |
-| waiter@demo.com | WAITER | `/login` |
-| chef@demo.com | CHEF → `/kds` | `/login` |
+Loads `MONGODB_URI` from `.env` / `.env.local` / `../frontend/.env.local`.
 
-### Platform admin
+## Deploy (Vercel)
 
-- `/admin/login` — SaaS platform admin sign-in
-- `/admin` — overview of restaurant registrations
-- `/admin/restaurants` — list / filter tenants
-- `/admin/restaurants/new` — register a restaurant (tenant + branch + owner)
+`vercel.json` builds `index.js` with `@vercel/node`. Set env vars in the Vercel project:
+
+- `MONGODB_URI`
+- `CORS_ORIGIN` (your frontend origin(s), comma-separated)
+- `APP_URL=https://restaurent-management-backend-sage.vercel.app`
+
+## Note
+
+This Express host exposes health checks (`/`, `/api/health`).
+
+RestaurantOS app APIs (auth, orders, menu, …) are Next.js route handlers in
+`../frontend/src/app/api/`. The frontend must call same-origin `/api/*`
+(do **not** set `NEXT_PUBLIC_API_URL` to this Express URL unless those routes
+are implemented here).

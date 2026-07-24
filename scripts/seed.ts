@@ -7,7 +7,7 @@ import { resolve } from "path";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-// Load .env.local without dotenv package (backend/ or frontend/)
+// Load .env / .env.local without dotenv (backend/ or frontend/)
 const envCandidates = [
   resolve(process.cwd(), ".env"),
   resolve(process.cwd(), ".env.local"),
